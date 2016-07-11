@@ -2,7 +2,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from article.models import Article
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.http import Http404
 from django.contrib.syndication.views import Feed
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -74,5 +74,10 @@ class RSSFeed(Feed):
 	def item_description(self, item):
 		return item.content
 
+def hours_ahead(request, offset):
+	offset = int(offset)
+	dt = datetime.now() + timedelta(hours=offset)
+	html = "<html><body>In %s hour(s), it will be %s.</body></html>" % (offset, dt)
+	return HttpResponse(html)
 
 
