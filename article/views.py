@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from article.models import Article
 from datetime import datetime, timedelta
 from django.http import Http404
 from django.contrib.syndication.views import Feed
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.core.mail import send_mail
+
+from .forms import ContactForm
 
 def home(request):
 	posts = Article.objects.all()   #获取全部Article对象
@@ -77,7 +80,34 @@ class RSSFeed(Feed):
 def hours_ahead(request, offset):
 	offset = int(offset)
 	dt = datetime.now() + timedelta(hours=offset)
-	html = "<html><body>In %s hour(s), it will be %s.</body></html>" % (offset, dt)
+	html = "<html><body>In %s hour(s), it will be %s. Thanks!</body></html>" % (offset, dt)
 	return HttpResponse(html)
+
+def contact_me(request):
+	# if this is a POST request we need to process the form data
+	if request.method == 'POST':
+		# create a form instance and populate it with data from the request:
+		form = ContactForm(request.POST)
+		# check whether it's valid:
+		if form.is_valid():
+			#process the data in form.cleaned_data as required
+			subject = form.cleaned_data['subject']
+			message = form.cleaned_data['message']
+			sender = form.cleaned_data['sender']
+			cc_myself = form.cleaned_data['cc_myself']
+
+			recipients = ['tangwang1993@qq.com']
+			if cc_myself:
+				recipients.append(sender)
+
+			send_mail(subject, message, sender, recipients)
+			# redirect to a new URL:
+			return HttpResponseRedirect('/time/plus/0/')
+
+	# if a GET(or any other method) we'll create a blank form
+	else:
+		form = ContactForm()
+
+	return render(request, 'contact.html', {'form': form})
 
 
