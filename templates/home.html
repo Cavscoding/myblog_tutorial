@@ -1,26 +1,23 @@
-<!--home.html-->
 {% extends "base.html" %}
-{%load custom_markdown %}
+{% load custom_markdown %}
 
 {% block content %}
-<div class="posts">
+<div class="posts">        
 	{% for post in post_list %}
-		<section class="post">
-			<header class="post-header">
-				<h2 class="post-title"><a href="{% url 'detail' post.id %}">{{ post.title }}</a></h2>
+		<div class="blog-post">
+			<h2 class="blog-post-title"><a href="{% url 'detail' post.id %}">{{ post.title }}</a></h2>
+				<p class="blog-post-meta">
+					<a href="#">{{ post.date_time|date:'Y /m /d' }}</a> 
+					<a href="{% url 'search_tag' post.category %}">{{ post.category|title }}</a>
+				</p>
 
-					<p class="post-meta">
-						Time: <a class="post-author" href="#">{{ post.date_time|date:'Y /m /d' }}</a> <a class="post-category post-category-js" href="{% url 'search_tag' post.category %}">{{ post.category|title }}</a>
+				<div class="post-description">
+					<p>
+						{{ post.content|truncatewords:20 }}
 					</p>
-				</header>
-
-					<div class="post-description">
-						<p>
-							{{ post.content|custom_markdown|truncatewords:20 }}
-						</p>
-					</div>
-					<a class="pure-button" href="{% url 'detail' post.id %}">Read More>>> </a>
-		</section>
+				</div>
+				<a href="{% url 'detail' post.id %}">Read More>>> </a>
+		</div>
 	{% endfor %}
 
 	{% if post_list.object_list and post_list.paginator.num_pages > 1 %}
@@ -40,6 +37,6 @@
 		</ul>
 		</div>
 	{% endif %}
-
+	
 </div><!-- /.blog-post -->
 {% endblock %}
