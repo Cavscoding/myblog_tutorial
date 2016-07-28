@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
-from article.models import Article
+from article.models import Article, Category
 from datetime import datetime, timedelta
 from django.http import Http404
 from django.contrib.syndication.views import Feed
@@ -20,31 +20,53 @@ def home(request):
 		post_list = paginator.page(1)
 	except EmptyPage:
 		post_list = paginator.paginator(paginator.num_pages)
-	return render(request, 'home.html', {'post_list': post_list})
+	context = {
+		'category_list': Category.objects.all(),
+		'post_list': post_list
+	}
+	return render(request, 'home.html', context)
 
 def detail(request, id):
 	try:
 		post = Article.objects.get(id=str(id))
 	except Article.DoesNotExist:
 		raise Http404
-	return render(request, 'post.html', {'post': post})
+	context = {
+		'category_list': Category.objects.all(),
+		'post': post
+	}
+	return render(request, 'post.html', context)
 
 def archives(request):
 	try:
 		post_list = Article.objects.all()
 	except Article.DoesNotExist:
 		raise Http404
-	return render(request, 'archives.html', {'post_list': post_list, 'error': False})
+	context = {
+		'category_list': Category.objects.all(),
+		'post_list': post_list,
+		'error': False
+	}
+	return render(request, 'archives.html',  context)
+
 
 def about_me(request):
-	return render(request, 'aboutme.html')
+	context = {
+		'category_list': Category.objects.all()
+	}
+
+	return render(request, 'aboutme.html', context)
 
 def search_tag(request, tag):
 	try:
-		post_list = Article.objects.filter(category__iexact = tag) #contains
+		post_list = Article.objects.filter(category__name__iexact = tag) #contains
 	except Article.DoesNotExist:
 		raise Http404
-	return render(request, 'tag.html', {'post_list': post_list})
+	context = {
+		'category_list': Category.objects.all(),
+		'post_list': post_list
+	}
+	return render(request, 'home.html', context)
 
 def blog_search(request):
 	if 's' in request.GET:
@@ -77,11 +99,6 @@ class RSSFeed(Feed):
 	def item_description(self, item):
 		return item.content
 
-def hours_ahead(request, offset):
-	offset = int(offset)
-	dt = datetime.now() + timedelta(hours=offset)
-	html = "<html><body>In %s hour(s), it will be %s. Thanks!</body></html>" % (offset, dt)
-	return HttpResponse(html)
 
 def contact_me(request):
 	# if this is a POST request we need to process the form data

@@ -1,42 +1,44 @@
 {% extends "base.html" %}
-{% load custom_markdown %}
+
 
 {% block content %}
-<div class="posts">        
-	{% for post in post_list %}
-		<div class="blog-post">
-			<h2 class="blog-post-title"><a href="{% url 'detail' post.id %}">{{ post.title }}</a></h2>
-				<p class="blog-post-meta">
-					<a href="#">{{ post.date_time|date:'Y /m /d' }}</a> 
-					<a href="{% url 'search_tag' post.category %}">{{ post.category|title }}</a>
-				</p>
 
-				<div class="post-description">
-					<p>
-						{{ post.content|truncatewords:20 }}
+	<div class="posts">        
+		{% for post in post_list %}
+			<div class="blog-post">
+				<h2 class="blog-post-title"><a href="{% url 'detail' post.id %}">{{ post.title }}</a></h2>
+					<p class="blog-post-meta">
+						<a href="#">{{ post.date_time|date:'N j, Y' }}</a> 
+						<a href="{% url 'search_tag' post.category %}">{{ post.category|title }}</a> 
 					</p>
-				</div>
-				<a href="{% url 'detail' post.id %}">Read More>>> </a>
-		</div>
-	{% endfor %}
 
-	{% if post_list.object_list and post_list.paginator.num_pages > 1 %}
-		<div>
-		<ul class = "pager">
-		{% if post_list.has_previous %}
-			<li>
-				<a href="?page={{ post_list.previous_page_number }}">上一页</a>
-			</li>
-		{% endif %}
+					<div class="post-description">
+						<p>
+							{{ post.content|truncatewords:20 }}
+						</p>
+					</div>
+					<a href="{% url 'detail' post.id %}">Read More>>> </a><hr/>
+			</div>
+		{% endfor %}
 
-		{% if post_list.has_next %}
-			<li>
-				<a href="?page={{ post_list.next_page_number }}">下一页</a>
-			</li>
+		{% if post_list.object_list and post_list.paginator.num_pages > 1 %}
+			<div>
+			<ul class = "pager">
+			{% if post_list.has_previous %}
+				<li>
+					<a href="?page={{ post_list.previous_page_number }}">上一页</a>
+				</li>
+			{% endif %}
+
+			{% if post_list.has_next %}
+				<li>
+					<a href="?page={{ post_list.next_page_number }}">下一页</a>
+				</li>
+			{% endif %}
+			</ul>
+			</div>
 		{% endif %}
-		</ul>
-		</div>
-	{% endif %}
-	
-</div><!-- /.blog-post -->
+		
+	</div><!-- /.blog-post -->
+
 {% endblock %}
